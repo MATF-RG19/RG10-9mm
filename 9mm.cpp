@@ -1,18 +1,20 @@
 #include <stdlib.h>
 #include <GL/glut.h>
 #include <math.h>
-#include "headers/draw.hpp"
+#include "headers/animate.hpp"
 
+float animation_parameter;
+int animation_ongoing;
+int safeguard;
 
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_reshape(int width, int height);
 static void on_display(void);
-static void on_timer(int id);
 
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 
     glutInitWindowSize(800, 600);
     glutInitWindowPosition(100, 100);
@@ -31,11 +33,12 @@ int main(int argc, char** argv) {
 
     glEnable(GL_NORMALIZE);
 
-    glEnable(GL_POLYGON_SMOOTH);
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC0_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    animation_ongoing = 0;
+    animation_parameter = 0;
+    safeguard = 0;
 
     glutMainLoop();
 
@@ -59,7 +62,6 @@ static void on_reshape(int width, int height){
     gluPerspective(60, (float) width / height, 1, 10);
 }
 
-
 static void on_display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -67,13 +69,10 @@ static void on_display(void) {
     glLoadIdentity();
     gluLookAt(1, 6, 4.1, 0, 0, 0, 0, 1, 0);   
 
-    init_lights();
+    int table[24] = {0, 0, -1, 0, 1, -1, -1, 1, 0, 0, 0, 1, 1, 0, 1, 1, -1, 0, 1, 0, 1, 0, 0};
 
-    draw_table();
-      
+    glutFullScreen();
+    animate_table(table); 
 
     glutSwapBuffers();
 }
-
-
-
