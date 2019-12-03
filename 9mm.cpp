@@ -6,6 +6,9 @@
 float animation_parameter;
 int animation_ongoing;
 int safeguard;
+float animation_parameter_abduct;
+int animation_ongoing_abduct;
+int safeguard_abduct;
 
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_reshape(int width, int height);
@@ -14,7 +17,7 @@ static void on_display(void);
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
+    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
 
     glutInitWindowSize(800, 600);
     glutInitWindowPosition(100, 100);
@@ -39,6 +42,9 @@ int main(int argc, char** argv) {
     animation_ongoing = 0;
     animation_parameter = 0;
     safeguard = 0;
+    animation_ongoing_abduct = 0;
+    animation_parameter_abduct = 0;
+    safeguard_abduct = 0;
 
     glutMainLoop();
 

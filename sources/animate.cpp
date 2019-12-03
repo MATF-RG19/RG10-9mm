@@ -18,10 +18,10 @@ void animate_table(int table[24]) {
         else if (table[i] == -1)
             draw_player_figure(i, 0.2, 40, 1);
     }    
-
-    move_opponent(9, 21);
-    move_player(10, 9);
-    
+        
+    //lift_opponent_figure(9);
+    abduct_player(9);
+    //move_opponent(9, 21);    
 }
 
 //animacija postavljanja igraceve figure na tablu
@@ -158,18 +158,143 @@ void move_opponent(int position1, int position2) {
     }
 }
 
-void on_timer(int id) {
-    if (id != 1) 
-        return;
+//animacija nosenja igraceve figure kada protivnik zatvori micu
+void abduct_player(int position) {
+    float coordinates[3];
+    get_coordinates_of_position(position, coordinates);
 
-    animation_parameter += 5;    
-
-    if (animation_ongoing && animation_parameter <= 100) {
-        glutPostRedisplay();
-        glutTimerFunc(100, on_timer, 1);
+    animation_ongoing_abduct = 1;
+    if (animation_parameter_abduct <= 100) {
+        glPushMatrix();
+        glTranslatef(0, (1 - animation_parameter_abduct / 100.0) * (3 - coordinates[2]), 0);
+        draw_opponent_ufo(position, 0);
+        glPopMatrix();
+        if (safeguard_abduct == 0) { 
+            glutTimerFunc(100, on_timer, 2);
+            safeguard_abduct = 1;
+        }
+    }
+    else if (animation_parameter_abduct > 100 && animation_parameter_abduct <= 200) {
+        draw_opponent_ufo(position, 0);
+        glPushMatrix();
+        double clip_plane[] = {0, 1, 0, -1.74 + 1.74 * (animation_parameter_abduct - 100) / 100};
+        glClipPlane(GL_CLIP_PLANE0, clip_plane);
+        glEnable(GL_CLIP_PLANE0);
+        set_material(3, 0.2);
+        draw_cone(position);
+        glDisable(GL_CLIP_PLANE0);
+        glPopMatrix();        
+    }
+    else if (animation_parameter_abduct > 200 && animation_parameter_abduct <= 300) {
+        draw_opponent_ufo(position, animation_parameter_abduct - 200);
+        set_material(3, 0.2);
+        draw_cone(position);
+        lift_player_figure(position);               
+    }
+    else if (animation_parameter_abduct > 300 && animation_parameter_abduct <= 400) {
+        draw_opponent_ufo(position, 100);
+        set_material(3, 0.2);
+        glPushMatrix();
+        double clip_plane[] = {0, 1, 0, -1.74 * ((animation_parameter_abduct - 300) / 100)};
+        glClipPlane(GL_CLIP_PLANE0, clip_plane);
+        glEnable(GL_CLIP_PLANE0);
+        set_material(3, 0.2);
+        draw_cone(position);
+        glDisable(GL_CLIP_PLANE0);
+        glPopMatrix();         
+    }
+    else if (animation_parameter_abduct > 400 && animation_parameter_abduct <= 500) {
+        glPushMatrix();
+        glTranslatef(0, ((animation_parameter_abduct-400) / 100.0) * (3 - coordinates[2]), 0);
+        draw_opponent_ufo(position, 100);
+        glPopMatrix();        
     }
     else {
-        animation_parameter = 0;
-        animation_ongoing = 0;
-    }    
+        safeguard_abduct = 0;
+    }
+
+}
+
+void abduct_opponent(int position) {
+    float coordinates[3];
+    get_coordinates_of_position(position, coordinates);
+
+    animation_ongoing_abduct = 1;
+    if (animation_parameter_abduct <= 100) {
+        glPushMatrix();
+        glTranslatef(0, (1 - animation_parameter_abduct / 100.0) * (3 - coordinates[2]), 0);
+        draw_player_ufo(position, 0);
+        glPopMatrix();
+        if (safeguard_abduct == 0) { 
+            glutTimerFunc(100, on_timer, 2);
+            safeguard_abduct = 1;
+        }
+    }
+    else if (animation_parameter_abduct > 100 && animation_parameter_abduct <= 200) {
+        draw_player_ufo(position, 0);
+        glPushMatrix();
+        double clip_plane[] = {0, 1, 0, -1.74 + 1.74 * (animation_parameter_abduct - 100) / 100};
+        glClipPlane(GL_CLIP_PLANE0, clip_plane);
+        glEnable(GL_CLIP_PLANE0);
+        set_material(2, 0.2);
+        draw_cone(position);
+        glDisable(GL_CLIP_PLANE0);
+        glPopMatrix();        
+    }
+    else if (animation_parameter_abduct > 200 && animation_parameter_abduct <= 300) {
+        draw_player_ufo(position, animation_parameter_abduct - 200);
+        set_material(2, 0.2);
+        draw_cone(position);
+        lift_opponent_figure(position);               
+    }
+    else if (animation_parameter_abduct > 300 && animation_parameter_abduct <= 400) {
+        draw_player_ufo(position, 100);
+        set_material(2, 0.2);
+        glPushMatrix();
+        double clip_plane[] = {0, 1, 0, -1.74 * ((animation_parameter_abduct - 300) / 100)};
+        glClipPlane(GL_CLIP_PLANE0, clip_plane);
+        glEnable(GL_CLIP_PLANE0);
+        set_material(2, 0.2);
+        draw_cone(position);
+        glDisable(GL_CLIP_PLANE0);
+        glPopMatrix();         
+    }
+    else if (animation_parameter_abduct > 400 && animation_parameter_abduct <= 500) {
+        glPushMatrix();
+        glTranslatef(0, ((animation_parameter_abduct-400) / 100.0) * (3 - coordinates[2]), 0);
+        draw_player_ufo(position, 100);
+        glPopMatrix();        
+    }
+    else {
+        safeguard_abduct = 0;
+    }
+}
+
+void on_timer(int id) {
+    if (id == 1) {
+        animation_parameter += 5;    
+
+        if (animation_ongoing && animation_parameter <= 100) {
+            glutPostRedisplay();
+            glutTimerFunc(100, on_timer, 1);
+        }
+        else {
+            animation_parameter = 0;
+            animation_ongoing = 0;
+        }  
+    }
+    else if (id == 2) {
+        animation_parameter_abduct += 5;    
+
+        if (animation_ongoing_abduct && animation_parameter_abduct <= 500) {
+            glutPostRedisplay();
+            glutTimerFunc(100, on_timer, 2);
+        }
+        else {
+            animation_parameter_abduct = 0;
+            animation_ongoing_abduct = 0;
+        }  
+    }  
+    else
+        return;    
 }

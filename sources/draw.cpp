@@ -53,6 +53,9 @@ void set_material(int id, float alpha) {
     else if (id == 3) {
       diffuse_coeffs[0] = 1.0;
     }
+    else if (id == 4) {
+      diffuse_coeffs[1] = 1.0;
+    }
 
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
@@ -151,6 +154,217 @@ void draw_player_figure(int position, float radius, int slices, float alpha) {
     glEnd();
   }
   glPopMatrix();
+}
+
+void set_normal_and_vertex_cone(float u, float v, float centerX, float centerY, float centerZ, float radius) {
+  glNormal3f(
+    u * sin(v) * radius * 0.4 + centerX,
+    (2*PI - u) * radius + centerY,
+    u * cos(v) * radius * 0.4 + centerZ
+  );
+
+  glVertex3f(
+    u * sin(v) * radius * 0.4 + centerX,
+    (2*PI - u) * radius + centerY,
+    u * cos(v) * radius * 0.4 + centerZ
+  );
+}
+
+void draw_cone(int position) {
+  float coordinates[3];
+  get_coordinates_of_position(position, coordinates);
+
+  float u, v;
+
+  glPushMatrix();
+  for (u = 2*PI; u >= 0; u -= PI / 80) {
+    glBegin(GL_LINES);
+    for (v = 0; v < 2 * PI + EPSILONE; v += PI / 7) {
+      set_normal_and_vertex_cone(u, v, coordinates[0], coordinates[1], coordinates[2], 0.23);
+      set_normal_and_vertex_cone(u + PI/40, v, coordinates[0], coordinates[1], coordinates[2], 0.23);
+    }
+    glEnd();
+  }
+  glPopMatrix();
+}
+
+void set_normal_and_vertex_ufo(float u, float v, float centerX, float centerY, float centerZ, float radius) {
+  glNormal3f(
+    u * sin(v) * radius + centerX,
+    u * 1.3 * radius + centerY,
+    u * cos(v) * radius + centerZ
+  );
+
+  glVertex3f(
+    u * sin(v) * radius + centerX,
+    u * 1.3 * radius + centerY,
+    u * cos(v) * radius + centerZ
+  );
+}
+
+void draw_player_ufo(int position, float angle) {
+  float coordinates[3];
+  get_coordinates_of_position(position, coordinates);
+
+  float u, v, coef;
+
+  set_material(4,1);
+  // y = PI * 1.3 * 0.23 + 1.74 + 0.025
+  //radius = 0.23 * PI (poluprecnik baze kupe nacrtane na onakav nacin)
+  draw_circle(coordinates[0], 2.703, coordinates[2], 0.23 * PI, 40);
+  glPushMatrix();
+  for (u = 0; u <= PI; u += PI / 60) {
+    glBegin(GL_TRIANGLE_STRIP);
+    for (v = 0; v < 2 * PI + EPSILONE; v += PI / 40) {
+      coef = ((float)rand() / (float)RAND_MAX + u / PI) / 2;
+      if (coef < 0.5) 
+        set_material(2, 1);
+      else
+        set_material(4, 1);      
+      set_normal_and_vertex_ufo(u, v, coordinates[0], coordinates[1] + 1.44, coordinates[2], 0.23);
+      set_normal_and_vertex_ufo(u + PI/40, v, coordinates[0], coordinates[1] + 1.44, coordinates[2], 0.23);
+    }
+    glEnd();
+  }
+  glPopMatrix();
+
+  
+  coef = (float)rand() / (float)RAND_MAX;
+  if (coef > 0.5) 
+    set_material(2, 1);
+  else
+    set_material(4, 1);
+  
+  glPushMatrix();
+  glTranslatef(coordinates[0], 2.703, coordinates[2]);
+  glutSolidSphere(0.3, 40, 40);
+
+
+  set_material(2, 1);
+  glPushMatrix();
+  glRotatef(-angle, 0, 1, 0);
+  draw_ufo_stabilisators();
+  glPopMatrix();
+  glPopMatrix();
+}
+
+void draw_opponent_ufo(int position, float angle) {
+  float coordinates[3];
+  get_coordinates_of_position(position, coordinates);
+
+  float u, v, coef;
+
+  set_material(4,1);
+  // y = PI * 1.3 * 0.23 + 1.74 + 0.025
+  //radius = 0.23 * PI (poluprecnik baze kupe nacrtane na onakav nacin)
+  draw_circle(coordinates[0], 2.703, coordinates[2], 0.23 * PI, 40);
+  glPushMatrix();
+  for (u = 0; u <= PI; u += PI / 60) {
+    glBegin(GL_TRIANGLE_STRIP);
+    for (v = 0; v < 2 * PI + EPSILONE; v += PI / 40) {
+      coef = ((float)rand() / (float)RAND_MAX + u / PI) / 2;
+      if (coef < 0.5) 
+        set_material(3, 1);
+      else
+        set_material(4, 1);      
+      set_normal_and_vertex_ufo(u, v, coordinates[0], coordinates[1] + 1.44, coordinates[2], 0.23);
+      set_normal_and_vertex_ufo(u + PI/40, v, coordinates[0], coordinates[1] + 1.44, coordinates[2], 0.23);
+    }
+    glEnd();
+  }
+  glPopMatrix();
+
+  
+  coef = (float)rand() / (float)RAND_MAX;
+  if (coef > 0.5) 
+    set_material(3, 1);
+  else
+    set_material(4, 1);
+  
+  glPushMatrix();
+  glTranslatef(coordinates[0], 2.703, coordinates[2]);
+  glutSolidSphere(0.3, 40, 40);
+
+
+  set_material(3, 1);
+  glPushMatrix();
+  glRotatef(angle, 0, 1, 0);
+  draw_ufo_stabilisators();
+  glPopMatrix();
+  glPopMatrix();
+}
+
+void draw_ufo_stabilisators() {
+  glBegin(GL_QUADS);    
+  //prvi stabilizator
+  //gornji pravougaonik
+  glVertex3f(1.3, -0.01, 0.05);
+  glVertex3f(1.3, -0.01, -0.05);
+  glVertex3f(-1.3, -0.01, -0.05);
+  glVertex3f(-1.3, -0.01, 0.05); 
+
+  //donji pravougaonik
+  glVertex3f(1.3, -0.08, 0.05);
+  glVertex3f(1.3, -0.08, -0.05);
+  glVertex3f(-1.3, -0.08, -0.05);
+  glVertex3f(-1.3, -0.08, 0.05);
+
+  //ostale ivice stabilizatora
+  glVertex3f(-1.3, -0.08, -0.05);
+  glVertex3f(-1.3, -0.01, -0.05);
+  glVertex3f(-1.3, -0.01, 0.05);
+  glVertex3f(-1.3, -0.08, 0.05);
+
+  glVertex3f(-1.3, -0.08, -0.05);
+  glVertex3f(-1.3, -0.01, -0.05);
+  glVertex3f(1.3, -0.01, -0.05);
+  glVertex3f(1.3, -0.08, -0.05);
+
+  glVertex3f(1.3, -0.08, -0.05);
+  glVertex3f(1.3, -0.01, -0.05);
+  glVertex3f(1.3, -0.01, 0.05);
+  glVertex3f(1.3, -0.08, 0.05);
+
+  glVertex3f(1.3, -0.08, 0.05);
+  glVertex3f(1.3, -0.01, 0.05);
+  glVertex3f(1.3, -0.01, -0.05);
+  glVertex3f(1.3, -0.08, -0.05);
+
+
+  //drugi stabilizator
+  //gornji pravougaonik
+  glVertex3f(0.05, -0.01, 1.3);
+  glVertex3f(0.05, -0.01, -1.3);
+  glVertex3f(-0.05, -0.01, -1.3);
+  glVertex3f(-0.05, -0.01, 1.3); 
+
+  //donji pravougaonik
+  glVertex3f(0.05, -0.08, 1.3);
+  glVertex3f(0.05, -0.08, -1.3);
+  glVertex3f(-0.05, -0.08, -1.3);
+  glVertex3f(-0.05, -0.08, 1.3);
+
+  //ostale ivice stabilizatora
+  glVertex3f(-0.05, -0.08, -1.3);
+  glVertex3f(-0.05, -0.01, -1.3);
+  glVertex3f(-0.05, -0.01, 1.3);
+  glVertex3f(-0.05, -0.08, 1.3);
+
+  glVertex3f(-0.05, -0.08, -1.3);
+  glVertex3f(-0.05, -0.01, -1.3);
+  glVertex3f(0.05, -0.01, -1.3);
+  glVertex3f(0.05, -0.08, -1.3);
+
+  glVertex3f(0.05, -0.08, -1.3);
+  glVertex3f(0.05, -0.01, -1.3);
+  glVertex3f(0.05, -0.01, 1.3);
+  glVertex3f(0.05, -0.08, 1.3);
+
+  glVertex3f(0.05, -0.08, 1.3);
+  glVertex3f(0.05, -0.01, 1.3);
+  glVertex3f(0.05, -0.01, -1.3);
+  glVertex3f(0.05, -0.08, -1.3);
+  glEnd();
 }
 
 void draw_table(float alpha) {
