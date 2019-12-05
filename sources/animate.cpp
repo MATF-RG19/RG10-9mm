@@ -6,6 +6,12 @@
 #include "../headers/animate.hpp"
 
 
+int get_mouse = 0;
+int mouse_set = 0;
+int x_mouse;
+int y_mouse;
+
+
 void animate_table(int table[24]) {
 
     init_lights();
@@ -17,11 +23,7 @@ void animate_table(int table[24]) {
             draw_opponent_figure(i, 0.2, 40, 1);
         else if (table[i] == -1)
             draw_player_figure(i, 0.2, 40, 1);
-    }    
-        
-    //lift_opponent_figure(9);
-    abduct_player(9);
-    //move_opponent(9, 21);    
+    }       
 }
 
 //animacija postavljanja igraceve figure na tablu
@@ -189,6 +191,7 @@ void abduct_player(int position) {
         draw_opponent_ufo(position, animation_parameter_abduct - 200);
         set_material(3, 0.2);
         draw_cone(position);
+        table[position] = 0; //izbrisemo tu figuru sa table u tom trenutku
         lift_player_figure(position);               
     }
     else if (animation_parameter_abduct > 300 && animation_parameter_abduct <= 400) {
@@ -297,4 +300,13 @@ void on_timer(int id) {
     }  
     else
         return;    
+}
+
+void on_click(int button, int state, int x, int y) {
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && get_mouse) {
+        x_mouse = x;
+        y_mouse = y;
+        get_mouse = 0;
+        mouse_set = 1;
+    }
 }

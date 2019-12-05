@@ -9,6 +9,7 @@ int safeguard;
 float animation_parameter_abduct;
 int animation_ongoing_abduct;
 int safeguard_abduct;
+int table[24] = {0, 0, -1, 0, 1, -1, -1, 1, 0, -1, 0, 1, 1, 0, 1, 1, -1, 0, 1, 0, 1, 0, 0};
 
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_reshape(int width, int height);
@@ -19,13 +20,14 @@ int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
 
-    glutInitWindowSize(800, 600);
-    glutInitWindowPosition(100, 100);
+    glutInitWindowSize(1366, 768);
+    glutInitWindowPosition(0, 0);
     glutCreateWindow("9 men's morris");
 
     glutKeyboardFunc(on_keyboard);
     glutDisplayFunc(on_display);
     glutReshapeFunc(on_reshape);
+    glutMouseFunc(on_click);
 
     glClearColor(0, 0, 0, 0);
     glEnable(GL_DEPTH_TEST);
@@ -60,12 +62,14 @@ static void on_keyboard(unsigned char key, int x, int y) {
 }
 
 static void on_reshape(int width, int height){
-    glViewport(0, 0, width, height);
+    
+    glViewport(0, 0, 1366, 768);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(60, (float) width / height, 1, 10);
+    gluPerspective(60, (float) 1366 / 768, 1, 10);
+    glutReshapeWindow(1366, 768);
 }
 
 static void on_display(void) {
@@ -75,9 +79,13 @@ static void on_display(void) {
     glLoadIdentity();
     gluLookAt(1, 6, 4.1, 0, 0, 0, 0, 1, 0);   
 
-    int table[24] = {0, 0, -1, 0, 1, -1, -1, 1, 0, 0, 0, 1, 1, 0, 1, 1, -1, 0, 1, 0, 1, 0, 0};
+    
 
-    glutFullScreen();
+    get_mouse = 1;
+        if(mouse_set) {   
+            abduct_player(9);
+        }
+
     animate_table(table); 
 
     glutSwapBuffers();

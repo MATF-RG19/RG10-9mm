@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include "../headers/draw.hpp"
 
+int ufo_sphere_material = 4;
+
 void init_lights() {
     GLfloat light0_position[] = {-3, 4.5, 2.2, 0};
     GLfloat light1_position[] = {3, 4.5, 3.1, 0};
@@ -228,12 +230,25 @@ void draw_player_ufo(int position, float angle) {
   }
   glPopMatrix();
 
-  
+  //da bi se boja sfere na ufo-u redje menjala
   coef = (float)rand() / (float)RAND_MAX;
-  if (coef > 0.5) 
-    set_material(2, 1);
-  else
-    set_material(4, 1);
+  if (coef > 0.9) 
+    if (ufo_sphere_material == 4 || ufo_sphere_material == 3) {
+      set_material(2, 1);
+      ufo_sphere_material = 2;
+    }
+    else {
+      set_material(4, 1);
+      ufo_sphere_material = 4;
+    }
+  else 
+    if (ufo_sphere_material == 4 || ufo_sphere_material == 3) {
+      set_material(4, 1);
+      ufo_sphere_material == 4;
+    }
+    else
+      set_material(2, 1);
+  
   
   glPushMatrix();
   glTranslatef(coordinates[0], 2.703, coordinates[2]);
@@ -274,17 +289,28 @@ void draw_opponent_ufo(int position, float angle) {
   }
   glPopMatrix();
 
-  
+  //da bi se boja sfere na ufo-u redje menjala
   coef = (float)rand() / (float)RAND_MAX;
-  if (coef > 0.5) 
-    set_material(3, 1);
-  else
-    set_material(4, 1);
+  if (coef > 0.9) 
+    if (ufo_sphere_material == 4 || ufo_sphere_material == 2) {
+      set_material(3, 1);
+      ufo_sphere_material = 3;
+    }
+    else {
+      set_material(4, 1);
+      ufo_sphere_material = 4;
+    }
+  else 
+    if (ufo_sphere_material == 4 || ufo_sphere_material == 2) {
+      set_material(4, 1);
+      ufo_sphere_material == 4;
+    }
+    else
+      set_material(3, 1);
   
   glPushMatrix();
   glTranslatef(coordinates[0], 2.703, coordinates[2]);
   glutSolidSphere(0.3, 40, 40);
-
 
   set_material(3, 1);
   glPushMatrix();
