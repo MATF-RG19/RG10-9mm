@@ -79,14 +79,13 @@ static void on_display(void) {
     glLoadIdentity();
     gluLookAt(1, 6, 4.1, 0, 0, 0, 0, 1, 0);   
 
-    
+
+    animate_table(table); 
 
     get_mouse = 1;
         if(mouse_set) {   
             abduct_player(9);
         }
-
-    animate_table(table); 
 
     glutSwapBuffers();
 }
