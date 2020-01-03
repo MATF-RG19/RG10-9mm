@@ -1,7 +1,7 @@
 #include <GL/glut.h>
 #include <math.h>
 #include <stdlib.h>
-#include <stdio.h>
+#include <iostream>
 #include "../headers/draw.hpp"
 #include "../headers/animate.hpp"
 
@@ -14,8 +14,8 @@ int y_mouse;
 
 void animate_table(int table[24]) {
 
-    init_lights();
-    draw_table(1);
+    init_lights();    
+    draw_table(1);    
 
     //postavljamo figure
     for (int i = 0; i < 24; i++) {
@@ -24,13 +24,14 @@ void animate_table(int table[24]) {
         else if (table[i] == -1)
             draw_player_figure(i, 0.2, 40, 1);
     }       
+    
 }
 
 //animacija postavljanja igraceve figure na tablu
 //izvodi se u opsegu tajmera 0-100
 void put_player_figure(int position) {
     animation_ongoing = 1;
-    if (animation_parameter <= 100) {
+    if (animation_parameter < 100) {
         glPushMatrix();
         glTranslatef(0, 1 - animation_parameter / 100, 0);
         draw_player_figure(position, 0.2, 40, animation_parameter / 100.0);
@@ -39,9 +40,14 @@ void put_player_figure(int position) {
             glutTimerFunc(100, on_timer, 1);
             safeguard = 1;
         }
+        //postavljam figuru na tablu i pre nego sto se animacija zavrsi kako se ne bi desavalo
+        //da na sekund nestane figura pre nego sto se ponovo iscrta
+        if (animation_parameter >= 94)
+            table[position] = -1;
     }
     else {
         safeguard = 0;
+        move_count++;
     }       
 }
 
@@ -49,7 +55,7 @@ void put_player_figure(int position) {
 //izvodi se u opsegu tajmera 0-100
 void put_opponent_figure(int position) {
     animation_ongoing = 1;
-    if (animation_parameter <= 100) {
+    if (animation_parameter < 100) {
         glPushMatrix();
         glTranslatef(0, 1 - animation_parameter / 100.0, 0);
         draw_opponent_figure(position, 0.2, 40, animation_parameter / 100.0);
@@ -58,9 +64,14 @@ void put_opponent_figure(int position) {
             glutTimerFunc(100, on_timer, 1);
             safeguard = 1;
         }
+        //postavljam figuru na tablu i pre nego sto se animacija zavrsi kako se ne bi desavalo
+        //da na sekund nestane figura pre nego sto se ponovo iscrta
+        if (animation_parameter >= 94)
+            table[position] = 1;
     }
     else {
         safeguard = 0;
+        move_count++;
     }
 }
 
@@ -300,13 +311,4 @@ void on_timer(int id) {
     }  
     else
         return;    
-}
-
-void on_click(int button, int state, int x, int y) {
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && get_mouse) {
-        x_mouse = x;
-        y_mouse = y;
-        get_mouse = 0;
-        mouse_set = 1;
-    }
 }

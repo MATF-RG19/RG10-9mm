@@ -1,20 +1,32 @@
 #include <stdlib.h>
 #include <GL/glut.h>
 #include <math.h>
+#include <iostream>
+#include "headers/game.hpp"
 #include "headers/animate.hpp"
+#include "headers/draw.hpp"
 
-float animation_parameter;
-int animation_ongoing;
-int safeguard;
-float animation_parameter_abduct;
-int animation_ongoing_abduct;
-int safeguard_abduct;
-int table[24] = {0, 0, -1, 0, 1, -1, -1, 1, 0, -1, 0, 1, 1, 0, 1, 1, -1, 0, 1, 0, 1, 0, 0};
+#define DEPTH 8
+
+float animation_parameter = 0;
+int animation_ongoing = 0;
+int safeguard = 0;
+float animation_parameter_abduct = 0;
+int animation_ongoing_abduct = 0;
+int safeguard_abduct = 0;
+int table[24] = {-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int tree_depth = DEPTH;
+int next_to_move = 1;
+int move_count = 0;
+int game_phase = 1;
+int cooefs[19] = {10, 10, 2, 6, 9, 25, 6, 15, 17, 8, 21, 28, 48, 3, 5779,
+                  23, 27, 31, 5949};
+int first_move;
+
 
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_reshape(int width, int height);
 static void on_display(void);
-
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
@@ -34,19 +46,17 @@ int main(int argc, char** argv) {
 
     glEnable(GL_LINE_SMOOTH);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-    glLineWidth(3);
+    glLineWidth(2);
 
     glEnable(GL_NORMALIZE);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    animation_ongoing = 0;
-    animation_parameter = 0;
-    safeguard = 0;
-    animation_ongoing_abduct = 0;
-    animation_parameter_abduct = 0;
-    safeguard_abduct = 0;
+    srand(time(NULL));
+    first_move = std::rand() % 4;
+
+    initialize_texture();
 
     glutMainLoop();
 
@@ -68,24 +78,14 @@ static void on_reshape(int width, int height){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(60, (float) 1366 / 768, 1, 10);
+    gluPerspective(60, (float) 1366 / 768, 1, 15);
     glutReshapeWindow(1366, 768);
 }
 
 static void on_display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt(1, 6, 4.1, 0, 0, 0, 0, 1, 0);   
-
-
-    animate_table(table); 
-
-    get_mouse = 1;
-        if(mouse_set) {   
-            abduct_player(9);
-        }
+    this_is_where_the_magic_happens();
 
     glutSwapBuffers();
 }

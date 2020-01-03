@@ -2,9 +2,14 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 #include "../headers/draw.hpp"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "../headers/stb_image.h"
+
 int ufo_sphere_material = 4;
+unsigned int texture;
 
 void init_lights() {
     GLfloat light0_position[] = {-3, 4.5, 2.2, 0};
@@ -51,12 +56,20 @@ void set_material(int id, float alpha) {
     }
     else if (id == 2) {
       diffuse_coeffs[2] = 1.0;
+      specular_coeffs[2] = 1.0;
     }
     else if (id == 3) {
       diffuse_coeffs[0] = 1.0;
+      specular_coeffs[0] = 1.0;
     }
     else if (id == 4) {
       diffuse_coeffs[1] = 1.0;
+      specular_coeffs[1] = 1.0;
+    }
+    else if(id == 5) {
+      diffuse_coeffs[0] = 0.6;
+      diffuse_coeffs[1] = 0.9;
+      diffuse_coeffs[2] = 0.6;
     }
 
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs);
@@ -468,15 +481,23 @@ void draw_table(float alpha) {
   glVertex3f(-1.7, 0.2, 0);
   glEnd();
 
+
+  glBindTexture(GL_TEXTURE_2D, texture);
   glBegin(GL_QUADS);
   set_material(0, alpha);     
   //gornji pravougaonik
+  glTexCoord2f(0, 0);
   glVertex3f(3, 0.2, 3);
+  glTexCoord2f(3, 0);
   glVertex3f(3, 0.2, -3);
+  glTexCoord2f(3, 3);
   glVertex3f(-3, 0.2, -3);
+  glTexCoord2f(0, 3);
   glVertex3f(-3, 0.2, 3);
+  glEnd();
+  glBindTexture(GL_TEXTURE_2D, 0);
   
-
+  glBegin(GL_QUADS);
   //donji pravougaonik
   glVertex3f(3, -0.2, 3);
   glVertex3f(3, -0.2, -3);
@@ -493,17 +514,25 @@ void draw_table(float alpha) {
   glVertex3f(-3, 0.2, -3);
   glVertex3f(3, 0.2, -3);
   glVertex3f(3, -0.2, -3);
-
+  
   glVertex3f(3, -0.2, -3);
   glVertex3f(3, 0.2, -3);
   glVertex3f(3, 0.2, 3);
   glVertex3f(3, -0.2, 3);
-
-  glVertex3f(3, -0.2, 3);
-  glVertex3f(3, 0.2, 3);
-  glVertex3f(3, 0.2, -3);
-  glVertex3f(3, -0.2, -3);
   glEnd();
+  
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glBegin(GL_QUADS);
+  glTexCoord2f(1, 0);
+  glVertex3f(3, -0.2, 3);
+  glTexCoord2f(0, 0);
+  glVertex3f(3, 0.2, 3);
+  glTexCoord2f(0, 3);
+  glVertex3f(-3, 0.2, 3);
+  glTexCoord2f(1, 3);
+  glVertex3f(-3, -0.2, 3);
+  glEnd();
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void get_coordinates_of_position(int i, float* coordinates) {
@@ -631,4 +660,42 @@ void get_coordinates_of_position(int i, float* coordinates) {
     *(coordinates + 1) = 0.3;
     *(coordinates + 2) = -2.8;
   }
+}
+
+void initialize_texture(void) {
+    //deo koda u ovoj f-ji preuzet sa learnopengl.com
+    glEnable(GL_TEXTURE_2D);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load and generate the texture
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("resources/marble.bmp", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    stbi_image_free(data);
+}
+
+void draw_background(float lineWidth) {
+  glPushMatrix();  
+  glLineWidth(lineWidth); 
+  glRotatef(90, 1, 0, 0);
+  glutWireTorus(2.5, 8, 15, 15); 
+  glutWireSphere(8, 25, 25);
+  glLineWidth(3);    
+  glPopMatrix();
 }
