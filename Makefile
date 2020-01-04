@@ -2,7 +2,7 @@
 	g++ -L/usr/X11R6/lib -L/usr/pkg/lib -o 9mm *.o -lglut -lGLU -lGL -lpthread	
 9mm.o: 9mm.cpp headers/animate.hpp headers/game.hpp
 	g++ -L/usr/X11R6/lib -L/usr/pkg/lib -c 9mm.cpp -lglut -lGLU -lGL	
-game.o: sources/game.cpp headers/game.hpp headers/animate.hpp headers/draw.hpp headers/alphabeta.hpp
+game.o: sources/game.cpp headers/game.hpp headers/animate.hpp headers/draw.hpp headers/alphabeta.hpp headers/pravila.hpp
 	g++ -L/usr/X11R6/lib -L/usr/pkg/lib -c sources/game.cpp -lglut -lGLU -lGL -lpthread
 animate.o: sources/animate.cpp headers/animate.hpp headers/draw.hpp
 	g++ -L/usr/X11R6/lib -L/usr/pkg/lib -c sources/animate.cpp -lglut -lGLU -lGL	

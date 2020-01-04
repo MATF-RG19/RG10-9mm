@@ -233,8 +233,9 @@ int min(int tabla[24], int alpha, int beta, int poslednjiPotezPozitivnog, int po
 /*
  * Potez je taj najbolji potez koji engine treba da odigra na kraju. Prosledjujemo dalje i
  * poslednji (tj. upravo) odigrani potez kako bi u sledecem pozivu imali proveru za upravo zatvorenu
- * micu. Ova heuristika se dodaje da bi smo bili sigurni da ce engine otvarati i zatvarati mice
- * Moglo je i bez toga uz dobre koeficijente za broj figura, broj otvorenih i zatvorenih mica ali
+ * micu. Ova heuristika se dodaje kako bi engine posebno obratio paznju na ta stanja kada se nadju
+ * na ivici horizonta a i da bi smo bili sigurni da ce engine otvarati i zatvarati mice.
+ * Ovo drugo je moglo i bez toga uz dobre koeficijente za broj figura, broj otvorenih i zatvorenih mica ali
  * ovako smo sigurni da se nece desiti da napravi micu i kaze super je ovo i nikad je ne otvori :)
  */
 int max(int tabla[24], int alpha, int beta, int potez[3], int poslednjiPotezPozitivnog,
@@ -513,5 +514,5 @@ int max(int tabla[24], int alpha, int beta, int potez[3], int poslednjiPotezPozi
 
 void alphabeta(int tabla[24], int potez[3], int dubina, int brojPoteza, int koef[19]) {
     max(tabla, -30000, 30000, potez, -1, -1, dubina, brojPoteza, koef);
-    engine_finished = 1;
+    engine_finished = 1;    
 }

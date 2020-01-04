@@ -157,6 +157,9 @@ void draw_player_figure(int position, float radius, int slices, float alpha) {
   set_material(2, alpha);
   glPushMatrix();
 
+  //kako figura ne bi blago lebdela iznad table
+  glTranslatef(0, -0.04, 0);
+
   draw_circle(centerX, centerY + half_of_whats_left, centerZ, r, 20);
   draw_circle(centerX, centerY - half_of_whats_left, centerZ, r, 20);
 
@@ -694,7 +697,11 @@ void draw_background(float lineWidth) {
   glPushMatrix();  
   glLineWidth(lineWidth); 
   glRotatef(90, 1, 0, 0);
-  glutWireTorus(2.5, 8, 15, 15); 
+
+  glutWireTorus(2.5, 8, 15, 15);
+
+  //i sfera pulsira u fazi sa torusom kada engine razmislja ali u manjem rasponu debljine linije
+  glLineWidth((0.3 + (lineWidth-0.3)/3.0));  
   glutWireSphere(8, 25, 25);
   glLineWidth(3);    
   glPopMatrix();

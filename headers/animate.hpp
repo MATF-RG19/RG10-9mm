@@ -22,19 +22,24 @@ extern int game_phase;
 extern int cooefs[19];
 extern int first_move;
 
+extern int move[3];
+
+extern float x_parameter;
+extern float yz_parameter;
 
 
 
 void animate_table(int table[24]);
-void put_player_figure(int position);
-void put_opponent_figure(int position);
+void put_player_figure(int position, int go_to_next_move);
+void put_opponent_figure(int position, int go_to_next_move);
 void lift_player_figure(int position);
 void lift_opponent_figure(int position);
-void jump_player(int position1, int position2);
-void jump_opponent(int position1, int position2);
-void move_player(int position1, int position2);
-void move_opponent(int position1, int position2);
+void jump_player(int position1, int position2, int go_to_next_move);
+void jump_opponent(int position1, int position2, int go_to_next_move);
+void move_player(int position1, int position2, int go_to_next_move);
+void move_opponent(int position1, int position2, int go_to_next_move);
 void abduct_player(int position);
 void abduct_opponent(int position);
+void animate_background();
 void on_timer(int id);
 void on_click(int button, int state, int x, int y);
