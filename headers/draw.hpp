@@ -16,3 +16,4 @@ void draw_opponent_ufo(int position, float angle);
 void draw_ufo_stabilisators();
 void initialize_texture(void);
 void draw_background(float lineWidth);
+void draw_ending_background(float parameter, int who_won);

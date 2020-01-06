@@ -71,6 +71,17 @@ void set_material(int id, float alpha) {
       diffuse_coeffs[1] = 0.9;
       diffuse_coeffs[2] = 0.6;
     }
+    else if (id == 6) {
+      diffuse_coeffs[0] = 0;
+      diffuse_coeffs[1] = 0.1;
+      diffuse_coeffs[2] = 0;
+
+      specular_coeffs[0] = 0.1;
+      specular_coeffs[1] = 0.9;
+      specular_coeffs[2] = 0.1;
+
+      shininess = 1;
+    }
 
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
@@ -704,5 +715,75 @@ void draw_background(float lineWidth) {
   glLineWidth((0.3 + (lineWidth-0.3)/3.0));  
   glutWireSphere(8, 25, 25);
   glLineWidth(3);    
+  glPopMatrix();
+}
+
+void set_normal_and_vertex_end(float u, float v, float parameter) {
+  glNormal3f(
+    (cos(u) * sin(v) * u) * sin(parameter),
+    cos(u) * sin(parameter) + 2,
+    sin(u) * sin(parameter)
+  );
+
+  glVertex3f(
+    (cos(u) * sin(v) * u) * sin(parameter),
+    cos(u) * sin(parameter) + 2,
+    sin(u) * sin(parameter)
+  );
+}
+
+void set_normal_and_vertex_end2(float u, float v, float parameter) {
+  glNormal3f(
+    (cos(u) * sin(v) * u) * sin(parameter),
+    sin(u) * sin(parameter) + 2,
+    sin(u) * sin(parameter)
+  );
+
+  glVertex3f(
+    (cos(u) * sin(v) * u) * sin(parameter),
+    sin(u) * sin(parameter) + 2,
+    sin(u) * sin(parameter)
+  );
+}
+
+void set_normal_and_vertex_end3(float u, float v, float parameter) {
+  glNormal3f(
+    (cos(u) * sin(v) * u) * sin(parameter),
+    sin(u) * cos(parameter) + 2,
+    cos(u) * sin(parameter)
+  );
+
+  glVertex3f(
+    (cos(u) * sin(v) * u) * sin(parameter),
+    sin(u) * cos(parameter) + 2,
+    cos(u) * sin(parameter)
+  );
+}
+
+void draw_ending_background(float parameter, int who_won) {
+  float u, v;  
+
+  glPushMatrix();
+  for (u = 0; u <= 2 * PI + EPSILONE; u += PI / (50 * sin(parameter))) {
+    glBegin(GL_POINTS);
+    for (v = 0; v < 2 * PI + EPSILONE; v += PI / (30 * sin(parameter))) {
+      
+      set_material(4, sin(parameter));
+      set_normal_and_vertex_end(u, v, parameter); 
+
+      if (who_won == 1) 
+        set_material(3, cos(exp(parameter)));
+      else if (who_won == -1) 
+        set_material(2, cos(exp(parameter)));
+      set_normal_and_vertex_end2(u, v, parameter);
+
+      if (who_won == 1) 
+        set_material(2, sin(exp(parameter)));
+      else if (who_won == -1) 
+        set_material(3, sin(exp(parameter)));
+      set_normal_and_vertex_end3(u, v, parameter);
+    }
+    glEnd();
+  }
   glPopMatrix();
 }

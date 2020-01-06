@@ -3,6 +3,7 @@
 #include "../headers/game.hpp"
 #include "../headers/alphabeta.hpp"
 #include "../headers/pravila.hpp"
+#include "../headers/heuristike.hpp"
 #include <GL/glut.h>
 #include <string.h>
 #include <iostream>
@@ -10,7 +11,7 @@
 
 
 int move[3] = {-1, -1, -1};
-int table1[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int table1[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int thread_safeguard = 1;
 
 float x_parameter = 0;
@@ -27,11 +28,15 @@ int legal_move_indicator = 101;
 int legal_move_indicator_safeguard = 1;
 int position_to_take_safeguard = 1;
 
+
 void this_is_where_the_magic_happens() {
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
     gluLookAt(1 + 1 * x_parameter, 6 - 4 * yz_parameter, 4.1 - 7 * yz_parameter, 
               0 + 2 * x_parameter, 0 + 0.5 * yz_parameter, 0 + 3 * yz_parameter, 0, 1, 0);
+
+
+    if (move_count == 18)
+        game_phase = 2;
+    
 
     if (engine_finished) {
         draw_background(0.3);
@@ -41,7 +46,7 @@ void this_is_where_the_magic_happens() {
     if (game_phase == 1) {
         if (move_count == 0) {
             //prvi potez engina
-            output("Engine is putting a figure.");
+            output("Engine is putting a piece.");
             //inicijalizacija prvog poteza
             if (first_move == 0) {
                 put_opponent_figure(4, 1);
@@ -61,7 +66,7 @@ void this_is_where_the_magic_happens() {
                 //igrac je na potezu            
                 if (!mouse_set) {
                     get_mouse = 1;
-                    output("Put your figure on an empty spot.");
+                    output("Put your piece on an empty spot.");
                 }
                 else {
                     int position = get_position_from_coordinates(x_mouse, y_mouse);
@@ -99,7 +104,7 @@ void this_is_where_the_magic_happens() {
                             }
                             else {
                                 if (!mouse_set_2) {
-                                    output("You have closed a mill. Select opponents figure you want to take.");
+                                    output("You have closed a mill. Select opponents piece you want to take.");
                                     get_mouse_2 = 1;
                                     get_mouse = 0;
                                 }
@@ -112,7 +117,7 @@ void this_is_where_the_magic_happens() {
                                     }
                                     else {
                                         if(table[position_to_take] != 1 && position_to_take_safeguard) {
-                                            output("You need to select opponents figure.");
+                                            output("You need to select opponents piece.");
                                             get_mouse_2 = 1;
                                             get_mouse = 0;
                                         }
@@ -120,7 +125,7 @@ void this_is_where_the_magic_happens() {
                                             if (legalnoNosenje(table, next_to_move, position_to_take) && position_to_take_safeguard) {
                                                 //kada legalnoNosenje vrati True to nije lagalno nosenje
                                                 //postoji logika iza ovoga :D
-                                                output("Figure you want to take can't be in a mill, unless all opponent figures are.");
+                                                output("Piece you want to take can't be in a mill, unless all opponent pieces are.");
                                                 get_mouse_2 = 1;
                                                 get_mouse = 0;
                                             } 
@@ -188,7 +193,7 @@ void this_is_where_the_magic_happens() {
                     else
                         output("Engine is thinking...");                 
                 }
-                if (engine_finished)
+                if (engine_finished) {
                     if (move[0] == -1) {
                         //NAPRAVITI ANIMACIJU!!!!!!!!
                         std::cout << "Pobedio je igrac" << std::endl;
@@ -197,7 +202,7 @@ void this_is_where_the_magic_happens() {
                         //provera da li i nosimo neku figuru
                         if (move[2] != -1) {
                             //bitno je da output bude pre animacije kako bi se animirala i pozadina ujedno
-                            output("Engine has closed a mill and will take your figure.");
+                            output("Engine has closed a mill and will take your piece.");
                             
                             if ((animation_parameter_abduct == 0) && (animation_parameter <= 105)) {
                                 put_opponent_figure(move[0], 0);
@@ -213,18 +218,94 @@ void this_is_where_the_magic_happens() {
                             }                                                         
                         }
                         else {
-                            output("Engine is putting a figure.");
+                            output("Engine is putting a piece.");
                             if (animation_parameter > 100) {
                                 thread_safeguard = 1;
                             }
                             put_opponent_figure(move[0], 1);  
                         }                 
                     }
+                }
             }
         }
     }
     else if (game_phase == 2) {
         //zavrseno je postavljane figura i pocinje druga faza igre
+        if (next_to_move == -1) {
+            //igrac je na potezu
+            if(!mouse_set) {
+                get_mouse = 1;
+                output("Select a piece you want to move.");
+            }
+            else {
+                int position = get_position_from_coordinates(x_mouse, y_mouse);
+                if (position == 100) {
+                    output("You need to be more accurate. Click again.");
+                    get_mouse = 1;
+                }
+                else if (table[position] != -1) {
+                    output("You have to select your piece. Click again.");
+                    get_mouse = 1;
+                }
+                else if (true) {
+                    output("There is no legal moves with this piece because all neighbouring spots are taken. Select another piece.");
+                    get_mouse = 1;
+                }
+                else {
+                    //igrac je selektovao figuru sa kojom ima legalnih poteza i sada je pomera
+
+                }
+            }
+        }
+        else {
+            //engine je na potezu
+            if (thread_safeguard) {
+                for (int i = 0; i < 24; i++)
+                    table1[i] = table[i];
+                std::thread t1(alphabeta, table, move, tree_depth, move_count, cooefs);
+                t1.detach();
+                thread_safeguard = 0;
+                engine_finished = 0;
+            }
+            if (!engine_finished) {
+                animate_background();
+                animate_table(table1);
+                output("Engine is thinking...");                 
+            }
+            if (engine_finished) {
+                if (move[0] == -1) {
+                    //NAPRAVITI ANIMACIJU!!!!!!!!
+                    std::cout << "Pobedio je igrac" << std::endl;
+                }
+                else {
+                    //provera da li i nosimo neku figuru
+                    if (move[2] != -1) {
+                        //bitno je da output bude pre animacije kako bi se animirala i pozadina ujedno
+                        output("Engine has closed a mill and will take your piece.");
+                            
+                        if ((animation_parameter_abduct == 0) && (animation_parameter <= 105)) {
+                            move_opponent(move[0], move[1], 0);
+                        }
+                        else {
+                            if (animation_parameter_abduct > 500) {
+                                //vracamo safeguard na 1 da bi engine mogao da se pokrene u sledecem potezu
+                                //a nema opasnosti da cemo upasti opet u pogresan deo toka igre jer kada je 
+                                //animation_parameter_abduct > 500 abduct_player ce prebaciti na sledeci potez
+                                thread_safeguard = 1;
+                            }
+                            abduct_player(move[2]);                                
+                        }                                                         
+                    }
+                    else {
+                        output("Engine is moving a piece.");
+                        if (animation_parameter > 100) {
+                            thread_safeguard = 1;
+                        }
+                        move_opponent(move[0], move[1], 1);  
+                    }                 
+                }
+            }
+        }
     }
 
 

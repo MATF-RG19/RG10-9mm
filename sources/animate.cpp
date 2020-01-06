@@ -1,6 +1,7 @@
 #include <GL/glut.h>
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 #include <iostream>
 #include "../headers/draw.hpp"
 #include "../headers/animate.hpp"
@@ -19,6 +20,14 @@ float background = 0;
 int background_indicator = 1;
 
 float reverse_camera_parameter = 0;
+
+int ending_animation_ongoing = 0;
+int animation_parameter_ending = 0;
+float animation_parameter_background_ending = 0;
+int animation_parameter_background_ending_indicator = 1;
+
+const char *opponent_won_string = "Engine has won!";
+const char *player_won_string = "Congratulations, you won!";
 
 
 void animate_table(int table[24]) {
@@ -182,8 +191,10 @@ void move_player(int position1, int position2, int go_to_next_move) {
             safeguard = 1;
         }
 
-        if (animation_parameter >= 94)
-            table[position2] == -1;
+        if (animation_parameter == 0)
+            table[position1] = 0;
+        else if (animation_parameter == 100)
+            table[position2] = -1;
     }
     else {
        if (go_to_next_move && (go_to_the_next_move_guard == 0)) {
@@ -215,8 +226,11 @@ void move_opponent(int position1, int position2, int go_to_next_move) {
             safeguard = 1;
         }
 
-        if (animation_parameter >= 94)
-            table[position2] == 1;
+        std::cout << animation_parameter << std::endl;
+        if (animation_parameter == 0)
+            table[position1] = 0;
+        else if (animation_parameter == 100)
+            table[position2] = 1;
     }
     else {
         if (go_to_next_move && (go_to_the_next_move_guard == 0)) {
@@ -426,6 +440,76 @@ void animate_background() {
     }
 }
 
+void end_game(int who_won) {
+    if (!ending_animation_ongoing) {
+        glutTimerFunc(20, on_timer, 3);
+        ending_animation_ongoing = 1;
+    }
+
+    if (animation_parameter_ending < 70) {
+        gluLookAt(1 - 1 * (animation_parameter_ending / 70.0), 6 - 6 * (animation_parameter_ending / 70.0), 4.1 + 0.9 * (animation_parameter_ending / 70.0), 0, 0, 0, 0, 1, 0);
+    }
+    else
+        gluLookAt(0, 0, 5, 0, 0, 0, 0, 1, 0);
+
+    if (animation_parameter_ending < 100) {
+        glPushMatrix();
+        glTranslatef(0, -(animation_parameter_ending - 50) * 0.05, 0);
+        glScalef(0.2 + 0.8 * (1 - (animation_parameter_ending / 100.0)), 0.2 + 0.8 * (1 - (animation_parameter_ending / 100.0)), 0.2 + 0.8 * (1 - (animation_parameter_ending / 100.0)));
+        animate_table(table);
+        glPopMatrix();
+    }
+
+    if (animation_parameter_ending >= 80 && animation_parameter_ending < 200) {
+        glPushMatrix();
+        glRotatef(45, 0, 1, 0);
+        glTranslatef(-2.8, 1 - 3.8 * ((animation_parameter_ending - 80) / 120.0), 2.8); 
+        glScalef(((animation_parameter_ending - 80) / 120.0), ((animation_parameter_ending - 80) / 120.0), ((animation_parameter_ending - 80) / 120.0));
+        if (who_won == 1)   
+            draw_opponent_ufo(23, 0);
+        else if (who_won == -1)
+            draw_player_ufo(23, 0);
+        glPopMatrix();
+    }
+    else if (animation_parameter_ending >= 200) {
+        glPushMatrix();
+        glRotatef(45, 0, 1, 0);
+        glTranslatef(-2.8, -2.8, 2.8);    
+        if (who_won == 1)   
+            draw_opponent_ufo(23, 0);
+        else if (who_won == -1)
+            draw_player_ufo(23, 0);
+        glPopMatrix();
+    }
+    
+    if (animation_parameter_ending > 195) {
+        glPushMatrix();
+        glTranslatef(0, -0.4, 0);
+        glScalef(0.8, 0.8, 0.8);
+        draw_ending_background(animation_parameter_background_ending, who_won);    
+        glPopMatrix();
+
+
+        set_material(6, 1);
+        if (who_won == 1) {
+            glRasterPos2f(-0.6, -2);
+            int len, i;
+            len = (int)strlen(opponent_won_string);
+            for (i = 0; i < len; i++) {
+                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, opponent_won_string[i]);
+            }
+        }
+        else if (who_won == -1) {
+            glRasterPos2f(-1, -2);
+            int len, i;
+            len = (int)strlen(player_won_string);
+            for (i = 0; i < len; i++) {
+                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, player_won_string[i]);
+            }
+        } 
+    }    
+}
+
 void on_timer(int id) {
     if (id == 1) {
         animation_parameter += 5; 
@@ -459,10 +543,23 @@ void on_timer(int id) {
 
             glutPostRedisplay();
             glutTimerFunc(100, on_timer, 2);            
-        }
-        
+        }        
 
-    }  
+    } 
+    else if (id == 3) {
+        animation_parameter_ending += 1;
+
+        if (animation_parameter_background_ending >= 3.138)
+            animation_parameter_background_ending_indicator= -1;
+        else if (animation_parameter_background_ending <= 0.009)
+            animation_parameter_background_ending_indicator = 1;
+
+        if (animation_parameter_ending > 195)
+            animation_parameter_background_ending += 0.003 * animation_parameter_background_ending_indicator;
+
+        glutPostRedisplay();
+        glutTimerFunc(32, on_timer, 3); 
+    } 
     else
         return;    
 }

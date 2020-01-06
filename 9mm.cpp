@@ -6,7 +6,7 @@
 #include "headers/animate.hpp"
 #include "headers/draw.hpp"
 
-#define DEPTH 8
+#define DEPTH 7
 
 float animation_parameter = 0;
 int animation_ongoing = 0;
@@ -14,15 +14,17 @@ int safeguard = 0;
 float animation_parameter_abduct = 0;
 int animation_ongoing_abduct = 0;
 int safeguard_abduct = 0;
-int table[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int table[24] = {1, 0, -1, 1, -1, -1, 1, -1, 0, 1, 0, -1, 1, 0, 1, 0, -1, 1, 0, -1, -1, 1, 0, -1};
 int tree_depth = DEPTH;
 int next_to_move = 1; 
-int move_count = 0;
+int move_count = 18;
 int game_phase = 1;
 int cooefs[19] = {10, 10, 2, 6, 9, 25, 6, 15, 17, 8, 21, 28, 48, 3, 5779,
                   23, 27, 31, 5949};
 int first_move;
 
+float parameter = 0;
+int parameter_indicator = 1;
 
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_reshape(int width, int height);
@@ -84,8 +86,12 @@ static void on_reshape(int width, int height){
 
 static void on_display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
-    this_is_where_the_magic_happens();
+    end_game(-1);
+
+    //this_is_where_the_magic_happens();
 
     glutSwapBuffers();
 }

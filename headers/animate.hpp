@@ -27,6 +27,8 @@ extern int move[3];
 extern float x_parameter;
 extern float yz_parameter;
 
+extern int animataion_parameter_ending;
+extern float animation_parameter_background_ending;
 
 
 void animate_table(int table[24]);
@@ -41,5 +43,6 @@ void move_opponent(int position1, int position2, int go_to_next_move);
 void abduct_player(int position);
 void abduct_opponent(int position);
 void animate_background();
+void end_game(int who_won);
 void on_timer(int id);
 void on_click(int button, int state, int x, int y);
