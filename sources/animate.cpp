@@ -33,7 +33,7 @@ const char *player_won_string = "Congratulations, you won!";
 void animate_table(int table[24]) {
 
     init_lights();    
-    draw_table(1 - reverse_camera_parameter);    
+    draw_table(1 - reverse_camera_parameter);
 
     //postavljamo figure
     for (int i = 0; i < 24; i++) {
@@ -226,11 +226,12 @@ void move_opponent(int position1, int position2, int go_to_next_move) {
             safeguard = 1;
         }
 
-        std::cout << animation_parameter << std::endl;
         if (animation_parameter == 0)
             table[position1] = 0;
-        else if (animation_parameter == 100)
+        else if (animation_parameter == 100) {
             table[position2] = 1;
+        }
+            
     }
     else {
         if (go_to_next_move && (go_to_the_next_move_guard == 0)) {
@@ -430,7 +431,7 @@ void animate_background() {
     draw_background(0.3 + background);
     if (background_indicator) {
         background += 0.05;
-        if (background >= 2.2)
+        if (background >= 2.5)
             background_indicator = 0;
     }
     else {

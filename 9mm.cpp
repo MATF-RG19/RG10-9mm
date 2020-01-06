@@ -89,9 +89,7 @@ static void on_display(void) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    end_game(-1);
-
-    //this_is_where_the_magic_happens();
+    this_is_where_the_magic_happens();
 
     glutSwapBuffers();
 }
