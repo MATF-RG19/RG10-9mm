@@ -15,6 +15,7 @@ extern int x_mouse;
 extern int y_mouse;
 
 extern int table[24];
+extern int depth;
 extern int tree_depth;
 extern int next_to_move;
 extern int move_count;

@@ -37,20 +37,86 @@ int position_to_take_safeguard = 1;
 int move_will_close_a_mill = 0;
 int move_will_close_a_mill_safeguard = 1;
 
+int end_indicator = 0;
+
+int game_phase_for_player = 2;
+int game_phase_for_engine = 2;
+int numberOfPieces[2] = {0, 0};
+
 
 void this_is_where_the_magic_happens() {
-    gluLookAt(1 + 1 * x_parameter, 6 - 4 * yz_parameter, 4.1 - 7 * yz_parameter, 
-              0 + 2 * x_parameter, 0 + 0.5 * yz_parameter, 0 + 3 * yz_parameter, 0, 1, 0);
+    if(end_indicator == 0)
+        gluLookAt(1 + 1 * x_parameter, 6 - 4 * yz_parameter, 4.1 - 7 * yz_parameter, 
+                  0 + 2 * x_parameter, 0 + 0.5 * yz_parameter, 0 + 3 * yz_parameter, 0, 1, 0);
+
+
+    //provera da li je doslo do zavrsetka partije
+
+    /*
+    * igrac je izgubio ukoliko je prosla prva faza igre a on ili je ostao sa 2 figure ili
+    * su mu sve figure blokirane a nema ih samo tri (ukoliko ima tri onda mozes da skoci na bilo
+    * koje polje na tabli),
+    * ili ukoliko u toku prve faze igre njegov protivnik postavljajuci poslednju figuru blokira
+    * sve igraceve (ili igrac postavi svoju poslednju figuru tako da nece imati legalnih poteza u narednom potezu)
+    */
+    if (engine_finished && !animation_ongoing && !animation_ongoing_abduct && animation_first_part) {
+        int result[4] = {0, 0, 0, 0};
+        brojBlokiranih(table, result);
+        if (game_phase != 1 && (result[3] == 2 || (result[3] == result[1] && result[3] != 3))) 
+            end_indicator = 1;
+        else if (game_phase != 1 && (result[2] == 2 || (result[2] == result[0] && result[2] != 3))) 
+            end_indicator = -1;
+        else if (result[3] == 9 && result[3] == result[1])
+            end_indicator = 1;
+        else if (result[2] == 9 && result[2] == result[0]) 
+            end_indicator = -1;
+
+        //promena dubine stabla pretrage po potrebi
+        if (move_count >= 18 && ((result[2] + result[3]) > 14)) {
+            tree_depth = depth + 1;
+        }
+        else if (move_count < 8 || result[2] == 3 || result[3] == 3) {
+            tree_depth = depth - 1;
+        }
+        else {
+            tree_depth = depth;
+        }
+    }
+    /*
+    PROBLEMI:
+    - lift u okviru abduct uopste ne radi nakon prve faze
+    - kada ostanu 4 figure krene jump umesto move iako ne mozes da skocis nigde osim na susednu
+    - kad ostanu tri figure ne mozes ni da ih selektujes. stoji you need to be more accurate
+    */
+
+    //provera po kojim pravirima igre igraju u sledecem potezu
+    if (engine_finished && !animation_ongoing && !animation_ongoing_abduct && animation_first_part) {
+        brojFigura(table, numberOfPieces);
+        if (numberOfPieces[0] == 3 && game_phase == 2)
+            game_phase_for_engine = 3;
+        else
+            game_phase_for_engine = 2;
+        
+        
+        if (numberOfPieces[1] == 3 && game_phase == 2)
+            game_phase_for_player = 3;
+        else
+            game_phase_for_player = 2;
+        
+    }
 
     if (move_count == 18)
         game_phase = 2;    
 
-    if (engine_finished) {
+    if (engine_finished && end_indicator == 0) {
         draw_background(0.3);
         animate_table(table); 
-    }    
+    }
 
-    if (game_phase == 1) {
+    if (end_indicator != 0) {
+        end_game(end_indicator);
+    }
+    else if (game_phase == 1) {
         if (move_count == 0) {
             //prvi potez engina
             output("Engine is putting a piece.");
@@ -195,15 +261,14 @@ void this_is_where_the_magic_happens() {
                 if (!engine_finished) {
                     animate_background();
                     animate_table(table1);
-                    if (move_count <= 8)
+                    if (move_count < 10)
                         output("Engine is thinking... (This may take a while)");
                     else
                         output("Engine is thinking...");                 
                 }
                 if (engine_finished) {
                     if (move[0] == -1) {
-                        //NAPRAVITI ANIMACIJU!!!!!!!!
-                        std::cout << "Pobedio je igrac" << std::endl;
+                        end_indicator = -1;
                     }
                     else {
                         //provera da li i nosimo neku figuru
@@ -243,12 +308,6 @@ void this_is_where_the_magic_happens() {
     //kraj prve faze igre
     else if (next_to_move == -1) {
         //na potezu je igrac
-
-        int numberOfPieces[2] = {0, 0};
-        brojFigura(table, numberOfPieces);
-        int game_phase_for_player = 2; 
-        if (numberOfPieces[1] == 3 && game_phase == 2)
-            game_phase_for_player = 3;
 
         if (game_phase_for_player == 2) {
             //igrac je na potezu
@@ -398,15 +457,135 @@ void this_is_where_the_magic_happens() {
         }
         else if (game_phase_for_player == 3) {
             //igrac igra po pravilima trece faze igre (moze figurom da skoci na bilo koju slobodnu poziciju)
+            if (!mouse_set) {
+                get_mouse = 1;
+                output("You can jump with any piece to any empty spot on the board. Select a piece.");
+            }
+            else {
+                int position = get_position_from_coordinates(x_mouse, y_mouse);
+                if (position == 100) {
+                    output("You need to be more accurate. Click again.");
+                }
+                else if (table[position] != -1 && legal_position_to_select_safeguard) {
+                    output("You have to select your piece. Click again.");
+                    get_mouse = 1;
+                }
+                else {
+                    //igrac je selektovao svoju figuru
+                    legal_position_to_select_safeguard = 0;
+                    if (!mouse_set_1) {
+                        get_mouse_1 = 1;
+                        output("Select an empty spot on the board.");
+                    }
+                    else {
+                        int position1 = get_position_from_coordinates(x_mouse_1, y_mouse_1);
+                        if (position1 == 100) {
+                            output("You need to be more accurate. Click again.");
+                            get_mouse_1 = 1;
+                        }
+                        else if (table[position1] == -1 && legal_move_indicator_safeguard) {
+                            output("By the touch-move rule you have to play with previously selected piece. Select an empty spot on the board.");
+                            get_mouse_1 = 1;
+                        }
+                        else if (table[position1] != 0 && legal_move_indicator_safeguard) {
+                            output("That is not an empty spot. Click again.");
+                            get_mouse_1 = 1;
+                        }
+                        else {
+                            //igrac je izabrao legalno polje na koje moze da skoci
+                            legal_move_indicator_safeguard = 0;
+                            if (move_will_close_a_mill_safeguard) {
+                                int tmp_move[3] = {position, position1, 0};
+                                move_will_close_a_mill = zatvorenaMicaDrugaITrecaFaza(table, next_to_move, tmp_move);
+                                move_will_close_a_mill_safeguard = 0;
+                            }
+                            if (move_will_close_a_mill) {
+                                //tim skokom igrac zatvara micu
+                                if (animation_first_part) {
+                                    jump_player(position, position1, 0);
+                                    if (animation_parameter > 100) {
+                                        animation_first_part = 0;
+                                    }
+                                }
+                                else {
+                                    if (!mouse_set_2) {
+                                        output("You have closed a mill. Select opponents piece you want to take.");
+                                        get_mouse_2 = 1;
+                                        get_mouse = 0;
+                                        get_mouse_1 = 0;
+                                    }
+                                    else {
+                                        int position_to_take = get_position_from_coordinates(x_mouse_2, y_mouse_2);
+                                        if (position_to_take == 100) {
+                                            output("You need to be more accurate. Click again.");
+                                            get_mouse_2 = 1;
+                                            get_mouse_1 = 0;
+                                            get_mouse = 0;
+                                        }
+                                        else if (table[position_to_take] != 1 && position_to_take_safeguard) {
+                                            output("You need to select opponents piece");
+                                            get_mouse_2 = 1;
+                                            get_mouse = 0;
+                                            get_mouse_1 = 0;
+                                        }
+                                        else if (legalnoNosenje(table, next_to_move, position_to_take) && position_to_take_safeguard) {
+                                            output("Piece you want to take can't be in a mill, unless all opponent pieces are.");
+                                            get_mouse_2 = 1;
+                                            get_mouse = 0;
+                                            get_mouse_1 = 0;
+                                        }
+                                        else {
+                                            //odabrana figura je legalna za nosenje
+                                            position_to_take_safeguard = 0;
+                                            if (animation_parameter_abduct > 500) {
+                                                animation_first_part = 1;
+                                                position_to_take_safeguard = 1;
+                                                legal_move_indicator_safeguard = 1;
+                                                legal_position_to_select_safeguard = 1;
+
+                                                mouse_set = 0;
+                                                mouse_set_1 = 0;
+                                                mouse_set_2 = 0;
+                                                x_mouse = 0;
+                                                y_mouse = 0;
+                                                x_mouse_1 = 0;
+                                                y_mouse_1 = 0;
+                                                x_mouse_2 = 0;
+                                                y_mouse_2 = 0;
+
+                                                move_will_close_a_mill_safeguard = 1;
+                                            }
+                                            abduct_opponent(position_to_take);
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                //taj skok ne zatvara micu
+                                if (animation_parameter > 100) {
+                                    legal_move_indicator_safeguard = 1;
+                                    legal_position_to_select_safeguard = 1;
+
+                                    mouse_set = 0;
+         	                        mouse_set_1 = 0;
+
+                                    x_mouse = 0;
+                                    y_mouse = 0;
+                                    x_mouse_1 = 0;
+                                    y_mouse_1 = 0;
+
+                                    move_will_close_a_mill_safeguard = 1;
+                                    }
+                                    jump_player(position, position1, 1);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
     else if (next_to_move == 1) {
         //na potezu je engine
-        int numberOfPieces[2] = {0, 0};
-        brojFigura(table, numberOfPieces);
-        int game_phase_for_engine = 2; 
-        if (numberOfPieces[0] == 3 && game_phase == 2)
-            game_phase_for_engine = 3;
 
         if (game_phase_for_engine == 2) {
             //engine igra po pravilima druge faze igre
@@ -425,8 +604,7 @@ void this_is_where_the_magic_happens() {
             }
             if (engine_finished) {
                 if (move[0] == -1) {
-                    //NAPRAVITI ANIMACIJU!!!!!!!!
-                    std::cout << "Pobedio je igrac" << std::endl;
+                    end_indicator = -1;
                 }
                 else {
                     //provera da li i nosimo neku figuru
@@ -462,6 +640,54 @@ void this_is_where_the_magic_happens() {
         }
         else if (game_phase_for_engine == 3) {
             //engine igra po pravilima trece faze igre
+            if (thread_safeguard) {
+                for (int i = 0; i < 24; i++)
+                    table1[i] = table[i];
+                std::thread t1(alphabeta, table, move, tree_depth, move_count, cooefs);
+                t1.detach();
+                thread_safeguard = 0;
+                engine_finished = 0;
+            }
+            if (!engine_finished) {
+                animate_background();
+                animate_table(table1);
+                output("Engine is thinking...");                 
+            }
+            if (engine_finished) {
+                if (move[0] == -1) {
+                    end_indicator = -1;
+                }
+                else {
+                    //provera da li i nosimo neku figuru
+                    if (move[2] != -1) {
+                        //bitno je da output bude pre animacije kako bi se animirala i pozadina ujedno
+                        output("Engine has closed a mill and will take your piece.");
+                            
+                        if ((animation_parameter_abduct == 0) && (animation_parameter <= 105) && animation_first_part) {
+                            if (animation_parameter == 105)
+                                animation_first_part = 0;
+                            jump_opponent(move[0], move[1], 0);                            
+                        }
+                        else {
+                            if (animation_parameter_abduct > 500) {
+                                //vracamo safeguard na 1 da bi engine mogao da se pokrene u sledecem potezu
+                                //a nema opasnosti da cemo upasti opet u pogresan deo toka igre jer kada je 
+                                //animation_parameter_abduct > 500 abduct_player ce prebaciti na sledeci potez
+                                thread_safeguard = 1;
+                                animation_first_part = 1;
+                            }
+                            abduct_player(move[2]);                                
+                        }                                                         
+                    }
+                    else {
+                        output("Engine is jumping.");
+                        if (animation_parameter > 100) {
+                            thread_safeguard = 1;
+                        }
+                        jump_opponent(move[0], move[1], 1);  
+                    }                 
+                }
+            }
         }
     }
 }

@@ -6,7 +6,7 @@
 #include "headers/animate.hpp"
 #include "headers/draw.hpp"
 
-#define DEPTH 7
+int depth = 8;
 
 float animation_parameter = 0;
 int animation_ongoing = 0;
@@ -14,12 +14,12 @@ int safeguard = 0;
 float animation_parameter_abduct = 0;
 int animation_ongoing_abduct = 0;
 int safeguard_abduct = 0;
-int table[24] = {1, 0, -1, 1, -1, -1, 1, -1, 0, 1, 0, -1, 1, 0, 1, 0, -1, 1, 0, -1, -1, 1, 0, -1};
-int tree_depth = DEPTH;
+int table[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int tree_depth = depth;
 int next_to_move = 1; 
-int move_count = 18;
+int move_count = 0;
 int game_phase = 1;
-int cooefs[19] = {10, 10, 2, 6, 9, 25, 6, 15, 17, 8, 21, 28, 48, 3, 5779,
+int cooefs[19] = {10, 10, 2, 8, 9, 25, 6, 15, 17, 8, 21, 28, 48, 3, 5779,
                   23, 27, 31, 5949};
 int first_move;
 

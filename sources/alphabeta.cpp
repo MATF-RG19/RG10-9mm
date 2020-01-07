@@ -19,13 +19,16 @@ int min(int tabla[24], int alpha, int beta, int poslednjiPotezPozitivnog, int po
     int vrednost = 0;
     int brojac;
 
-    if (rezultat[3] == 2 || rezultat[3] == rezultat[1])
+    if (brojPoteza >= 18 && (rezultat[3] == 2 || (rezultat[3] == rezultat[1] && rezultat[3] != 3)))
         pobeda = 1;
+    else if (brojPoteza >= 18 && (rezultat[2] == 2 || (rezultat[2] == rezultat[0] && rezultat[2] != 3)))
+        pobeda = -1;
+    else if (rezultat[3] == 9 && rezultat[3] == rezultat[1])
+        pobeda = 1;
+    else if (rezultat[2] == 9 && rezultat[2] == rezultat[0])
+        pobeda = -1;
     else
-        if (rezultat[2] == 2 || rezultat[2] == rezultat[0])
-            pobeda = -1;
-        else
-            pobeda = 0;
+        pobeda = 0;
 
     if (brojPoteza < 18) {
         //jos uvek je prva faza igre
@@ -257,13 +260,16 @@ int max(int tabla[24], int alpha, int beta, int potez[3], int poslednjiPotezPozi
     int brojac;
 
 
-    if (rezultat[3] == 2 || rezultat[3] == rezultat[1])
+    if (brojPoteza >= 18 && (rezultat[3] == 2 || (rezultat[3] == rezultat[1] && rezultat[3] != 3)))
         pobeda = 1;
+    else if (brojPoteza >= 18 && (rezultat[2] == 2 || (rezultat[2] == rezultat[0] && rezultat[2] != 3)))
+        pobeda = -1;
+    else if (rezultat[3] == 9 && rezultat[3] == rezultat[1])
+        pobeda = 1;
+    else if (rezultat[2] == 9 && rezultat[2] == rezultat[0])
+        pobeda = -1;
     else
-        if (rezultat[2] == 2 || rezultat[2] == rezultat[0])
-            pobeda = -1;
-        else
-            pobeda = 0;
+        pobeda = 0;
 
 
     if (brojPoteza < 18) {

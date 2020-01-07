@@ -428,10 +428,10 @@ void abduct_opponent(int position) {
 //animacija pulsirajuce pozadine
 void animate_background() {
     set_material(3, 1);
-    draw_background(0.3 + background);
+    draw_background(0.3 + 3 * sin(background));
     if (background_indicator) {
         background += 0.05;
-        if (background >= 2.5)
+        if (background >= 3.14)
             background_indicator = 0;
     }
     else {
