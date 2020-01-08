@@ -1,5 +1,6 @@
 #include "../headers/pravila.hpp"
 #include "../headers/heuristike.hpp"
+#include <iostream>
 
 
 //proverava da li je igrac odigrao legalan potez u prvoj fazi igre
@@ -22,7 +23,7 @@ int legalnoNosenje(int tabla[24], int igracNaPotezu, int pozicija) {
   int indikator = 0;
 
   for (brojac = 0; brojac < 24; brojac++)
-    if(tabla[brojac] == -igracNaPotezu && uMici(tabla, brojac)) {
+    if(tabla[brojac] == -igracNaPotezu && !uMici(tabla, brojac)) {
       indikator = 1;
       break;
     }

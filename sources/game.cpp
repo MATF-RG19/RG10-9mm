@@ -49,7 +49,6 @@ void this_is_where_the_magic_happens() {
         gluLookAt(1 + 1 * x_parameter, 6 - 4 * yz_parameter, 4.1 - 7 * yz_parameter, 
                   0 + 2 * x_parameter, 0 + 0.5 * yz_parameter, 0 + 3 * yz_parameter, 0, 1, 0);
 
-
     //provera da li je doslo do zavrsetka partije
 
     /*
@@ -727,7 +726,7 @@ int get_position_from_coordinates(int x, int y) {
         return 15;
     else if ((x <= 740 && x >= 695) && (y <= 245 && y >= 220)) 
         return 16;
-    else if ((x <= 875 && x >= 240) && (y <= 270 && y >= 245)) 
+    else if ((x <= 875 && x >= 840) && (y <= 270 && y >= 245)) 
         return 17;
     else if ((x <= 570 && x >= 535) && (y <= 190 && y >= 155)) 
         return 18;
