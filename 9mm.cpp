@@ -6,7 +6,9 @@
 #include "headers/animate.hpp"
 #include "headers/draw.hpp"
 
-int depth = 8;
+
+int depth = 7; // 7 - easy, 8 - normal (~30 sec per move), 9 - hard (~2-3 min per move)
+
 
 float animation_parameter = 0;
 int animation_ongoing = 0;
