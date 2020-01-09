@@ -2,7 +2,7 @@
 
 Nine Men’s Morris engine and GUI developed from the ground up using C and FreeGLUT.
 
-[![Nine Men’s Morris](https://img.youtube.com/vi/xaaOT-JRM80/0.jpg)](https://www.youtube.com/watch?v=xaaOT-JRM80)
+https://www.youtube.com/watch?v=xaaOT-JRM80
 
 ## :memo: Description
 
