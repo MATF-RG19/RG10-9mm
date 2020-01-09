@@ -74,8 +74,11 @@ void this_is_where_the_magic_happens() {
         if (move_count >= 18 && ((result[2] + result[3]) > 14)) {
             tree_depth = depth + 1;
         }
-        else if (move_count < 8 || result[2] == 3 || result[3] == 3) {
+        else if (move_count < 8) {
             tree_depth = depth - 1;
+        }
+	else if (result[2] == 3 || result[3] == 3) {
+            tree_depth = depth - 2;
         }
         else {
             tree_depth = depth;

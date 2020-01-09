@@ -109,8 +109,12 @@ int min(int tabla[24], int alpha, int beta, int poslednjiPotezPozitivnog, int po
                 //evaluacija prema heuristikama za trecu fazu igre
                 int dvaITriKonf[2] = {0, 0};
                 brojDvaITriKonfiguracija(tabla, dvaITriKonf);
+                
+                int brMicaIOtvorenih[3] = {0, 0, 0};
+                miceIOtvoreneMice(tabla, brMicaIOtvorenih);
 
-                return (koef[15] * dvaITriKonf[0]) + (koef[16] * dvaITriKonf[1]) + (koef[17] * (poslednjiPotezNegativnog + poslednjiPotezPozitivnog)) +
+                return (koef[10] * (rezultat[2] - rezultat[3])) + (koef[11] * brMicaIOtvorenih[1]) +
+                       (koef[12] * brMicaIOtvorenih[2]) + (koef[15] * dvaITriKonf[0]) + (koef[16] * dvaITriKonf[1]) + (koef[17] * (poslednjiPotezNegativnog + poslednjiPotezPozitivnog)) +
                        (koef[18] * pobeda);
             }
         }
@@ -367,7 +371,11 @@ int max(int tabla[24], int alpha, int beta, int potez[3], int poslednjiPotezPozi
                 int dvaITriKonf[2] = {0, 0};
                 brojDvaITriKonfiguracija(tabla, dvaITriKonf);
 
-                return (koef[15] * dvaITriKonf[0]) + (koef[16] * dvaITriKonf[1]) + (koef[17] * (poslednjiPotezNegativnog + poslednjiPotezPozitivnog)) +
+                int brMicaIOtvorenih[3] = {0, 0, 0};
+                miceIOtvoreneMice(tabla, brMicaIOtvorenih);
+
+                return (koef[10] * (rezultat[2] - rezultat[3])) + (koef[11] * brMicaIOtvorenih[1]) +
+                       (koef[12] * brMicaIOtvorenih[2]) + (koef[15] * dvaITriKonf[0]) + (koef[16] * dvaITriKonf[1]) + (koef[17] * (poslednjiPotezNegativnog + poslednjiPotezPozitivnog)) +
                        (koef[18] * pobeda);
             }
         }

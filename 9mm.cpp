@@ -7,7 +7,7 @@
 #include "headers/draw.hpp"
 
 
-int depth = 7; // 7 - easy, 8 - normal (~30 sec per move), 9 - hard (~2-3 min per move)
+int depth = 8; // 7 - easy, 8 - normal (~30 sec per move), 9 - hard (~2-3 min per move)
 
 
 float animation_parameter = 0;
@@ -21,8 +21,8 @@ int tree_depth = depth;
 int next_to_move = 1; 
 int move_count = 0;
 int game_phase = 1;
-int cooefs[19] = {10, 10, 2, 8, 9, 25, 6, 15, 17, 8, 21, 28, 48, 3, 5779,
-                  23, 27, 31, 5949};
+int cooefs[19] = {10, 10, 2, 8, 9, 25, 6, 15, 19, 8, 49, 28, 37, 3, 5779,
+                  20, 12, 21, 5949};
 int first_move;
 
 float parameter = 0;
