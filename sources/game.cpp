@@ -74,22 +74,13 @@ void this_is_where_the_magic_happens() {
         if (move_count >= 18 && ((result[2] + result[3]) > 14)) {
             tree_depth = depth + 1;
         }
-        else if (move_count < 8) {
+        else if (move_count < 8 || result[2] == 3 || result[3] == 3) {
             tree_depth = depth - 1;
-        }
-	else if (result[2] == 3 || result[3] == 3) {
-            tree_depth = depth - 2;
         }
         else {
             tree_depth = depth;
         }
     }
-    /*
-    PROBLEMI:
-    - lift u okviru abduct uopste ne radi nakon prve faze
-    - kada ostanu 4 figure krene jump umesto move iako ne mozes da skocis nigde osim na susednu
-    - kad ostanu tri figure ne mozes ni da ih selektujes. stoji you need to be more accurate
-    */
 
     //provera po kojim pravirima igre igraju u sledecem potezu
     if (engine_finished && !animation_ongoing && !animation_ongoing_abduct && animation_first_part) {
