@@ -2,6 +2,8 @@
 
 Nine Men’s Morris engine and GUI developed from the ground up using C and FreeGLUT.
 
+[![Nine Men’s Morris](https://img.youtube.com/vi/xaaOT-JRM80/0.jpg)](https://www.youtube.com/watch?v=xaaOT-JRM80)
+
 ## :memo: Description
 
 Nine Men’s Morris is an ancient game, popular in Ancient Rome and the medieval period. The oldest building that has a Nine Men’s Morris board carved into its stones is an Egyptian temple at Kurna, Egypt, which dates to roughly 1400 BCE. The game is also know as Mill (probably because the shape of the board looks like a windmill), Merrels or in serbian Mica. The name Nine Men’s Morris seems to have been originated by Shakespeare in his play, A Midsummer Night’s Dream. It's been reintroduced to the wider audiences as a mini game in Assassin's Creed III developed by Ubisoft.
